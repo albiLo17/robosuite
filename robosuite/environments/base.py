@@ -11,6 +11,8 @@ from robosuite.renderers.base import load_renderer_config
 from robosuite.utils import OpenCVRenderer, SimulationError, XMLError
 from robosuite.utils.binding_utils import MjRenderContextOffscreen, MjSim
 
+import h5py
+
 REGISTERED_ENVS = {}
 
 
@@ -669,6 +671,37 @@ class MujocoEnv(metaclass=EnvMeta):
         """Do any cleanup necessary here."""
         self._destroy_viewer()
         self._destroy_sim()
+        
+    # custom function to load the goal
+    def load_goal_file(self, file_path):
+        """
+        Load an HDF5 goal file and print the datasets contained within.
+
+        Args:
+            file_path (str): Path to the HDF5 goal file.
+
+        Returns:
+            dict: A dictionary where keys are dataset names and values are the loaded data.
+        """
+        # Check if the file path has the correct extension
+        if not file_path.endswith("_goal.hdf5"):
+            print("File does not have the correct '_goal.hdf5' extension.")
+            return None
+
+        # Open the HDF5 file in read mode
+        with h5py.File(file_path, 'r') as goal_file:
+            # Create a dictionary to store the datasets
+            goal_data = {}
+
+            # Iterate through all keys (datasets) in the HDF5 file
+            for key in goal_file.keys():
+                # Load the dataset into memory
+                data = goal_file[key][:]
+                goal_data[key] = data
+                print(f"Loaded dataset '{key}' with shape {data.shape}")
+
+            return goal_data
+
 
     @property
     def observation_modalities(self):

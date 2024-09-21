@@ -1,6 +1,7 @@
 from collections import OrderedDict
 
 import numpy as np
+import copy
 
 from robosuite.environments.manipulation.single_arm_env import SingleArmEnv
 from robosuite.models.arenas import TableArena
@@ -164,7 +165,10 @@ class Lift(SingleArmEnv):
         camera_segmentations=None,  # {None, instance, class, element}
         renderer="mujoco",
         renderer_config=None,
+        goal_path=None
     ):
+        
+        # print("************* INSIDE LIFT ENVIRONMENT *************")
         # settings for table top
         self.table_full_size = table_full_size
         self.table_friction = table_friction
@@ -206,6 +210,10 @@ class Lift(SingleArmEnv):
             renderer=renderer,
             renderer_config=renderer_config,
         )
+        
+        if goal_path is not None:
+            self.goal = self.load_goal_file(goal_path)
+            
 
     def reward(self, action=None):
         """
@@ -381,6 +389,15 @@ class Lift(SingleArmEnv):
                 )
 
         return observables
+    
+    def _get_goal(self):
+        """
+        Returns the desired goal for the task.
+
+        Returns:
+            dict: a dictionary containing the goal for the task
+        """
+        return self.goal
 
     def _reset_internal(self):
         """

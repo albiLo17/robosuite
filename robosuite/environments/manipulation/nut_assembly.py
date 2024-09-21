@@ -183,6 +183,7 @@ class NutAssembly(SingleArmEnv):
         camera_segmentations=None,  # {None, instance, class, element}
         renderer="mujoco",
         renderer_config=None,
+        goal_path=None
     ):
         # task settings
         self.single_object_mode = single_object_mode
@@ -236,6 +237,9 @@ class NutAssembly(SingleArmEnv):
             renderer=renderer,
             renderer_config=renderer_config,
         )
+        
+        if goal_path is not None:
+            self.goal = self.load_goal_file(goal_path)
 
     def reward(self, action=None):
         """
@@ -377,6 +381,15 @@ class NutAssembly(SingleArmEnv):
         ):
             res = True
         return res
+    
+    def _get_goal(self):
+        """
+        Returns the desired goal for the task.
+
+        Returns:
+            dict: a dictionary containing the goal for the task
+        """
+        return self.goal
 
     def _load_model(self):
         """
